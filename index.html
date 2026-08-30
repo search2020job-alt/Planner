@@ -1,0 +1,840 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MPPSC 6-Month Planner</title>
+<style>
+:root{
+  --bg:#f4f7ff;--card:#ffffff;--text:#172033;--muted:#667085;--line:#e6eaf2;
+  --purple:#6d5dfc;--purple2:#eeeaff;--blue:#2f80ed;--cyan:#00a8cc;
+  --green:#16a34a;--green2:#eaf8ef;--orange:#f59e0b;--orange2:#fff5df;
+  --pink:#ec4899;--pink2:#fff0f7;--nav:#15152b;--nav2:#242344;
+  --shadow:0 12px 34px rgba(31,41,81,.09)
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:
+linear-gradient(135deg,#f7f8ff 0%,#eef7ff 50%,#fff7fb 100%);color:var(--text)}
+.app{display:flex;min-height:100vh}
+.side{width:270px;background:linear-gradient(180deg,#15152b,#211d48);color:#fff;padding:20px 14px;position:fixed;inset:0 auto 0 0;overflow:auto;box-shadow:8px 0 30px rgba(24,22,55,.14)}
+.brand{font-size:21px;font-weight:850;padding:10px 12px 20px;letter-spacing:-.3px}
+.brand:before{content:"✦";display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;margin-right:9px;background:linear-gradient(135deg,#8b7cff,#42c9ff);vertical-align:middle}
+.brand small{display:block;color:#b9b8cf;font-size:11px;font-weight:500;line-height:1.45;margin:9px 4px 0 46px}
+.nav button{display:flex;align-items:center;gap:9px;width:100%;border:0;background:transparent;color:#c9c8d9;text-align:left;padding:11px 12px;border-radius:11px;margin:3px 0;cursor:pointer;font-size:13px;font-weight:650;transition:.2s}
+.nav button:before{content:"›";color:#7775a0;font-size:17px}
+.nav button:hover{background:rgba(255,255,255,.08);color:#fff;transform:translateX(2px)}
+.nav button.active{background:linear-gradient(135deg,#6d5dfc,#7b63ff);color:#fff;box-shadow:0 7px 18px rgba(109,93,252,.3)}
+.nav button.active:before{color:#fff}
+.main{margin-left:270px;width:calc(100% - 270px);padding:28px;max-width:1550px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}
+.top h1{margin:0;font-size:30px;letter-spacing:-.8px}
+.top p{margin:6px 0;color:var(--muted);font-size:14px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:#fff;border-radius:11px;padding:10px 14px;cursor:pointer;font-weight:700;box-shadow:0 4px 12px rgba(20,30,60,.04)}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary{background:linear-gradient(135deg,var(--purple),#8b72ff);color:#fff;border-color:transparent}
+.page{display:none}.page.active{display:block}
+.grid{display:grid;gap:16px}
+.cards{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{background:rgba(255,255,255,.92);border:1px solid rgba(230,234,242,.9);border-radius:17px;padding:19px;box-shadow:var(--shadow)}
+.cards .card:nth-child(1){border-top:4px solid var(--purple)}
+.cards .card:nth-child(2){border-top:4px solid var(--blue)}
+.cards .card:nth-child(3){border-top:4px solid var(--green)}
+.cards .card:nth-child(4){border-top:4px solid var(--orange)}
+.kpi{font-size:30px;font-weight:850;margin-top:7px}
+.label{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.section{margin-top:18px}.section h2{font-size:18px;margin:0 0 13px}
+.progress{height:10px;background:#edf0f6;border-radius:20px;overflow:hidden;margin-top:9px}
+.bar{height:100%;background:linear-gradient(90deg,#6d5dfc,#42c9ff);width:0;border-radius:20px;transition:.3s}
+.quick{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.today{display:flex;flex-direction:column;gap:9px}
+.task{display:flex;align-items:center;gap:10px;padding:11px;border:1px solid var(--line);border-radius:11px;background:#fbfcff;transition:.15s}
+.task:hover{background:#f5f3ff;border-color:#d8d2ff}
+.task input{width:18px;height:18px;accent-color:var(--purple)}
+.task.done{text-decoration:line-through;color:var(--muted);background:var(--green2)}
+table{width:100%;border-collapse:separate;border-spacing:0;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+th,td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left;font-size:13px}
+th{background:linear-gradient(90deg,#f3f1ff,#eef8ff);font-weight:800;color:#30364d;position:sticky;top:0;z-index:1}
+tr:nth-child(even) td{background:#fcfdff}tr:hover td{background:#f8f7ff}
+tr:last-child td{border-bottom:0}
+.table-wrap{overflow:auto;max-height:70vh;border-radius:14px}
+.search{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:11px;margin-bottom:12px;background:#fff;box-shadow:0 5px 18px rgba(20,30,60,.04);outline:none}
+.search:focus{border-color:#a99fff;box-shadow:0 0 0 4px #eeeaff}
+.pill{display:inline-block;background:var(--purple2);color:#5144c7;padding:5px 9px;border-radius:99px;font-size:11px;font-weight:800}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.note{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
+.roadmap-item{padding:12px;border-radius:12px;background:linear-gradient(90deg,#f7f5ff,#f4fbff);margin-bottom:9px;border:1px solid #e9e7f7}
+input[type=checkbox]{cursor:pointer}
+@media(max-width:1000px){.side{width:225px}.main{margin-left:225px;width:calc(100% - 225px);padding:20px}.cards{grid-template-columns:repeat(2,1fr)}.quick{grid-template-columns:1fr}}
+@media(max-width:680px){.side{position:static;width:100%;height:auto}.app{display:block}.main{margin-left:0;width:100%;padding:15px}.nav{display:grid;grid-template-columns:repeat(2,1fr);gap:3px}.cards{grid-template-columns:1fr 1fr}.top{align-items:flex-start;flex-direction:column}.top h1{font-size:25px}.actions{width:100%}.btn{flex:1}.table-wrap{max-height:65vh}}
+
+/* === Extra productivity features === */
+:root{
+  --success:#16a34a;--danger:#ef4444;--warning:#f59e0b;
+}
+body.dark{
+  --bg:#0b1020;--card:#151b2e;--text:#eef2ff;--muted:#a7b0c5;--line:#2a3450;
+  background:linear-gradient(135deg,#0b1020,#111936,#171225);
+}
+body.dark .card,body.dark table,body.dark .search,body.dark .btn{background:#151b2e;color:var(--text);border-color:#2a3450}
+body.dark th{background:#202743;color:#eef2ff}
+body.dark td{border-color:#2a3450} body.dark tr:nth-child(even) td{background:#181f34}
+body.dark .task{background:#182039;border-color:#2a3450}
+body.dark .roadmap-item{background:#1b2340;border-color:#30395a}
+body.dark .label,.dark .note{color:#a7b0c5}
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.feature-card{padding:16px;border-radius:15px;border:1px solid var(--line);background:linear-gradient(135deg,#fff,#f8f7ff)}
+.dark .feature-card{background:#151b2e}
+.feature-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+.feature-value{font-size:25px;font-weight:850;margin:6px 0}
+.mini-btn{border:0;border-radius:9px;padding:8px 10px;cursor:pointer;font-weight:700;background:#eeeaff;color:#5144c7}
+.dark .mini-btn{background:#28244e;color:#c9c3ff}
+.timer{font-size:38px;font-weight:900;letter-spacing:1px;text-align:center;margin:8px 0}
+.timer-controls{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
+.timer-input{width:75px;padding:8px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--text)}
+.streak-fire{font-size:28px}
+.quote{font-size:14px;line-height:1.55;font-weight:650}
+.goal-row{display:flex;gap:8px;margin-top:8px}
+.goal-row input{flex:1;padding:9px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text)}
+.goal-list{margin-top:10px;display:flex;flex-direction:column;gap:7px}
+.goal{display:flex;align-items:center;gap:8px;padding:8px;border-radius:9px;background:#f7f8ff}
+.dark .goal{background:#1b2340}
+.toast{position:fixed;right:20px;bottom:20px;background:#172033;color:#fff;padding:12px 15px;border-radius:10px;box-shadow:0 10px 25px #0003;z-index:9999;opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+@media(max-width:900px){.feature-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:650px){.feature-grid{grid-template-columns:1fr}}
+
+.alarm-active{background:linear-gradient(135deg,#fff7df,#fff0f7)!important;border-color:#f5c96a!important}
+.dark .alarm-active{background:#2b2430!important;border-color:#6b5870!important}
+
+/* === Calendar, targets, charts, mock-test features === */
+.dashboard-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:16px}
+.target-box{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.target-stat{padding:12px;border-radius:12px;background:linear-gradient(135deg,#f4f1ff,#eef9ff);text-align:center}
+.dark .target-stat{background:#1b2340}
+.target-stat b{display:block;font-size:22px}
+.target-stat span{font-size:11px;color:var(--muted)}
+.calendar-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.calendar-head button{border:0;border-radius:8px;padding:7px 10px;cursor:pointer;background:#eeeaff;color:#5144c7;font-weight:800}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal-day,.cal-week{min-height:43px;padding:6px;border-radius:9px;font-size:11px}
+.cal-week{text-align:center;font-weight:800;color:var(--muted);min-height:auto}
+.cal-day{background:#f8f9fd;border:1px solid #edf0f6;cursor:pointer}
+.dark .cal-day{background:#1a2137;border-color:#2a3450}
+.cal-day:hover{border-color:#aaa0ff}
+.cal-day.today{outline:2px solid var(--purple)}
+.cal-day.selected{background:#eeeaff;border-color:#8d80ff}
+.cal-day.has-target:after{content:"•";display:block;color:var(--green);font-size:18px;line-height:9px}
+.target-form{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:7px;margin-top:10px}
+.target-form input,.target-form select{padding:9px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text)}
+.chart-wrap{height:230px;display:flex;align-items:flex-end;gap:10px;padding:15px 6px 8px;border-bottom:1px solid var(--line)}
+.chart-col{flex:1;height:100%;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px}
+.chart-bar{width:min(38px,70%);min-height:3px;border-radius:7px 7px 2px 2px;background:linear-gradient(180deg,#6d5dfc,#43c9ef);transition:.3s}
+.chart-label{font-size:10px;color:var(--muted);text-align:center}
+.chart-val{font-size:10px;font-weight:800}
+.mock-form{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.mock-form input{padding:9px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text)}
+.mock-list{margin-top:12px;max-height:220px;overflow:auto}
+.mock-row{display:grid;grid-template-columns:1fr 70px 70px 70px 28px;gap:7px;align-items:center;padding:8px;border-bottom:1px solid var(--line);font-size:12px}
+@media(max-width:900px){.dashboard-grid{grid-template-columns:1fr}.target-form{grid-template-columns:1fr 1fr}.mock-form{grid-template-columns:1fr 1fr}}
+@media(max-width:650px){.target-box{grid-template-columns:1fr 1fr 1fr}.target-form,.mock-form{grid-template-columns:1fr}.mock-row{grid-template-columns:1fr 55px 55px 55px 25px}}
+
+/* === Exam Profile, Countdown & Syllabus === */
+.exam-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:16px}
+.exam-fields{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.exam-fields input,.exam-fields select,.exam-fields textarea{width:100%;padding:10px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text);font:inherit}
+.exam-fields textarea{min-height:70px;resize:vertical;grid-column:1/-1}
+.exam-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.countdown{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:12px}
+.count-box{background:linear-gradient(135deg,#f0edff,#eaf9ff);border-radius:12px;padding:11px;text-align:center}
+.dark .count-box{background:#1b2340}
+.count-box b{display:block;font-size:25px;font-weight:900}.count-box span{font-size:10px;color:var(--muted);text-transform:uppercase}
+.exam-status{display:inline-block;padding:6px 10px;border-radius:99px;background:#eaf8ef;color:#147a3d;font-size:11px;font-weight:800}
+.dark .exam-status{background:#173b2a;color:#8de3ad}
+.syllabus-list{display:flex;flex-direction:column;gap:8px;margin-top:10px;max-height:270px;overflow:auto}
+.syllabus-item{display:flex;align-items:center;gap:9px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#fafbff}
+.dark .syllabus-item{background:#1a2137}
+.syllabus-item.done{background:var(--green2)}
+.syllabus-item input{width:18px;height:18px;accent-color:var(--green)}
+.syllabus-actions{display:flex;gap:6px;margin-top:9px}
+.syllabus-actions input{flex:1;padding:9px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--text)}
+.info-chip{display:inline-block;margin:4px 4px 0 0;padding:5px 8px;border-radius:8px;background:#f0edff;color:#5144c7;font-size:11px;font-weight:750}
+.dark .info-chip{background:#28244e;color:#c9c3ff}
+@media(max-width:900px){.exam-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.exam-fields{grid-template-columns:1fr}.countdown{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="side">
+  <div class="brand">MPPSC Planner<small>6-Month Study + Personality Development</small></div>
+  <div class="nav" id="nav"></div>
+</aside>
+<main class="main">
+  <div class="top">
+    <div><h1 id="pageTitle">Dashboard</h1><p id="subtitle">Your complete MPPSC study planner</p></div>
+    <div class="actions">
+      <button class="btn" onclick="resetProgress()">Reset Progress</button>
+      <button class="btn primary" onclick="exportProgress()">Export Progress</button>
+    </div>
+  </div>
+
+  <section class="page active" id="dashboard">
+    <div class="card" style="margin-bottom:16px;background:linear-gradient(135deg,#6d5dfc,#3bb9ef);color:#fff;border:0">
+      <div style="font-size:12px;font-weight:800;opacity:.85;text-transform:uppercase;letter-spacing:.8px">MPPSC 6-Month Mission</div>
+      <div style="font-size:24px;font-weight:850;margin-top:5px">Study smart. Track daily. Improve every week. 🚀</div>
+      <div style="margin-top:7px;opacity:.9;font-size:13px">Your planner combines Prelims, Mains, Current Affairs, English and Personality Development.</div>
+    </div>
+    <div class="grid cards">
+      <div class="card"><div class="label">Planner sections</div><div class="kpi" id="sectionCount">0</div></div>
+      <div class="card"><div class="label">Tracked tasks</div><div class="kpi" id="taskCount">0</div></div>
+      <div class="card"><div class="label">Completed</div><div class="kpi" id="doneCount">0</div></div>
+      <div class="card"><div class="label">Overall progress</div><div class="kpi" id="pct">0%</div><div class="progress"><div class="bar" id="overallBar"></div></div></div>
+    </div>
+
+    <div class="section feature-grid">
+      <div class="feature-card">
+        <div class="feature-title">🔥 Study Streak</div>
+        <div class="feature-value"><span id="streakValue">0</span> days</div>
+        <div class="note">Complete at least one task daily.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-title">🎯 Today's Goals</div>
+        <div class="goal-row">
+          <input id="goalInput" placeholder="Add a small goal...">
+          <button class="mini-btn" onclick="addGoal()">Add</button>
+        </div>
+        <div class="goal-list" id="goalList"></div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-title">🧠 Daily Motivation</div>
+        <div class="quote" id="dailyQuote"></div>
+        <button class="mini-btn" style="margin-top:8px" onclick="newQuote()">New quote</button>
+      </div>
+    </div>
+
+    <div class="section feature-grid">
+      <div class="feature-card">
+        <div class="feature-title">⏱️ Focus Timer</div>
+        <div class="timer" id="timerDisplay">25:00</div>
+        <div class="timer-controls">
+          <button class="mini-btn" onclick="startTimer()">Start</button>
+          <button class="mini-btn" onclick="pauseTimer()">Pause</button>
+          <button class="mini-btn" onclick="resetTimer()">Reset</button>
+          <input class="timer-input" id="timerMinutes" type="number" min="1" max="180" value="25">
+        </div>
+      </div>
+
+      <div class="feature-card">
+        <div class="feature-title">⏰ Study Alarm</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px">
+          <input class="timer-input" id="alarmTime" type="time" style="width:100%">
+          <select class="timer-input" id="alarmType" style="width:100%">
+            <option value="Study">📚 Study</option>
+            <option value="Revision">🔄 Revision</option>
+            <option value="MCQ">📝 MCQ/PYQ</option>
+            <option value="English">🗣️ English/PD</option>
+            <option value="Break">☕ Break</option>
+          </select>
+        </div>
+        <div class="timer-controls" style="margin-top:8px">
+          <button class="mini-btn" onclick="setAlarm()">Set Alarm</button>
+          <button class="mini-btn" onclick="clearAlarm()">Clear</button>
+        </div>
+        <div class="note" id="alarmStatus">No alarm set.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-title">🌙 Appearance</div>
+        <div class="feature-value" id="themeText">Light Mode</div>
+        <button class="mini-btn" onclick="toggleTheme()">Toggle Dark Mode</button>
+        <div class="note">Your preference is saved on this device.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-title">💾 Backup</div>
+        <div class="feature-value">Protect your progress</div>
+        <button class="mini-btn" onclick="exportFullData()">Backup Data</button>
+        <button class="mini-btn" onclick="importData()">Restore</button>
+        <div class="note">Includes checkboxes, goals and settings.</div>
+      </div>
+    </div>
+
+    
+
+    <div class="section exam-grid">
+      <div class="card">
+        <h2>🎓 MPPSC Exam Profile</h2>
+        <div style="margin-bottom:10px"><span class="exam-status" id="examStatus">Exam details not set</span></div>
+        <div class="exam-fields">
+          <input id="applicationNo" placeholder="Application / Registration No.">
+          <input id="rollNo" placeholder="Roll No. (optional)">
+          <input id="examName" placeholder="Exam Name e.g. State Service">
+          <input id="examDate" type="date">
+          <input id="admitDate" type="date">
+          <input id="resultDate" type="date">
+          <input id="examFormLink" placeholder="Official form / notification link">
+          <input id="admitLink" placeholder="Admit card link">
+          <textarea id="examNotes" placeholder="Important exam notes, centre, documents, fees, etc."></textarea>
+        </div>
+        <div class="exam-actions">
+          <button class="mini-btn" onclick="saveExamProfile()">💾 Save Exam Details</button>
+          <button class="mini-btn" onclick="clearExamProfile()">Clear</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>⏳ Exam Countdown</h2>
+        <div id="examCountdownEmpty" class="empty">Set your exam date to start countdown.</div>
+        <div class="countdown" id="examCountdown" style="display:none">
+          <div class="count-box"><b id="cdDays">0</b><span>Days</span></div>
+          <div class="count-box"><b id="cdHours">0</b><span>Hours</span></div>
+          <div class="count-box"><b id="cdMinutes">0</b><span>Minutes</span></div>
+          <div class="count-box"><b id="cdSeconds">0</b><span>Seconds</span></div>
+        </div>
+        <div id="examInfoChips" style="margin-top:12px"></div>
+        <div class="note">Countdown updates automatically while the planner is open.</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="card">
+        <h2>📚 MPPSC Syllabus Tracker</h2>
+        <div class="note">Add your syllabus topics/papers and tick them off as you complete them.</div>
+        <div class="syllabus-actions">
+          <input id="syllabusInput" placeholder="Add syllabus topic e.g. Indian Polity – Fundamental Rights">
+          <button class="mini-btn" onclick="addSyllabus()">Add Topic</button>
+        </div>
+        <div class="syllabus-list" id="syllabusList"></div>
+      </div>
+    </div>
+
+    <div class="section dashboard-grid">
+      <div class="card">
+        <h2>📅 Study Calendar</h2>
+        <div class="calendar-head">
+          <button onclick="changeMonth(-1)">‹</button>
+          <b id="calendarTitle"></b>
+          <button onclick="changeMonth(1)">›</button>
+        </div>
+        <div class="calendar-grid" id="calendar"></div>
+        <div class="note">Click a date to set or view your daily target.</div>
+      </div>
+      <div class="card">
+        <h2>🎯 Daily Target</h2>
+        <div class="target-box">
+          <div class="target-stat"><b id="targetHours">0</b><span>Hours</span></div>
+          <div class="target-stat"><b id="targetMcq">0</b><span>MCQs</span></div>
+          <div class="target-stat"><b id="targetTasks">0</b><span>Tasks</span></div>
+        </div>
+        <div class="target-form">
+          <input id="goalHours" type="number" min="0" placeholder="Hours">
+          <input id="goalMcq" type="number" min="0" placeholder="MCQs">
+          <input id="goalTasks" type="number" min="0" placeholder="Tasks">
+          <button class="mini-btn" onclick="saveDailyTarget()">Save</button>
+        </div>
+        <div class="note" id="targetDateLabel"></div>
+      </div>
+    </div>
+
+    <div class="section dashboard-grid">
+      <div class="card">
+        <h2>📈 Subject Progress</h2>
+        <div class="chart-wrap" id="subjectChart"></div>
+        <div class="note">Progress is calculated from completed checklist items in the subject tracker.</div>
+      </div>
+      <div class="card">
+        <h2>🧪 Mock Test Scoreboard</h2>
+        <div class="mock-form">
+          <input id="mockName" placeholder="Test name">
+          <input id="mockTotal" type="number" min="1" placeholder="Total">
+          <input id="mockCorrect" type="number" min="0" placeholder="Correct">
+          <button class="mini-btn" onclick="addMock()">Add Test</button>
+        </div>
+        <div class="mock-list" id="mockList"></div>
+      </div>
+    </div>
+
+<div class="section quick">
+      <div class="card"><h2>Today's Focus</h2><div class="today" id="todayTasks"></div></div>
+      <div class="card"><h2>6-Month Roadmap</h2><div id="roadmap"></div></div>
+    </div>
+    <div class="section card"><h2>How to use</h2><p>Use the left menu to open each planner. Check items as you complete them; progress is saved automatically in this browser. Use Export Progress to download your current status.</p></div>
+  </section>
+
+  <section class="page" id="sheetPage">
+    <input class="search" id="sheetSearch" placeholder="Search this planner..." oninput="renderSheet()">
+    <div class="table-wrap" id="tableWrap"></div>
+  </section>
+</main>
+</div>
+
+<script>
+const DATA = {"START HERE": [["MPPSC + Personality Development | 6-Month Complete Planner", "", "", "", ""], ["How to Use", "Daily", "Weekly", "Monthly", "Rule"], ["MPPSC", "Follow morning + night study blocks", "Sunday test + analysis", "Complete monthly syllabus", "Consistency > long hours"], ["Personality Development", "30 min English/communication", "1 speaking review", "Track confidence/fluency", "Practice aloud"], ["Current Affairs", "20–30 min", "Weekly revision", "Monthly compilation", "Make short notes"], ["Mains", "—", "3–5 answers from Month 5", "1 essay/month initially", "Review presentation"], ["Health", "20 min meditation + exercise", "5–6 days", "Check sleep consistency", "Protect recovery"]], "Daily Planner": [["Daily Time Planner", "", "", "", "", "", ""], ["Time", "Fixed Activity", "MPPSC", "PD / English", "Family / Health", "Done", "Notes"], ["6:30–6:40", "Wake + water", "", "", "", "☐", ""], ["6:40–7:00", "Meditation", "", "Focus preparation", "", "☐", ""], ["7:00–7:40", "", "Main Subject", "", "", "☐", ""], ["7:45–8:15", "Child school drop", "", "", "Family", "☐", ""], ["8:15–8:40", "Breakfast", "", "", "", "☐", ""], ["8:40–9:10", "", "Current Affairs / Revision", "English/Vocabulary", "", "☐", ""], ["9:10–9:45", "Get ready", "", "", "", "☐", ""], ["9:50", "Leave home", "", "", "Commute", "☐", ""], ["10:00–1:30", "Office", "", "", "", "☐", ""], ["1:30–2:30", "Lunch + Rest", "", "", "Recovery", "☐", ""], ["2:30–7:00", "Office", "", "", "", "☐", ""], ["7:00–8:00", "Return home", "", "", "Commute", "☐", ""], ["8:00–9:00", "Dinner + Family", "", "", "Family", "☐", ""], ["9:00–9:45", "", "Main Study", "", "", "☐", ""], ["9:45–10:15", "", "MCQ / PYQ", "", "", "☐", ""], ["10:15–10:45", "", "", "English + PD", "", "☐", ""], ["10:45–11:15", "", "", "Reflection / relax", "Family", "☐", ""], ["11:15–11:30", "", "Next-day planning", "", "", "☐", ""], ["11:30–12:00", "", "", "Light reading / sleep", "Recovery", "☐", ""]], "6-Month Master": [["6-Month MPPSC Master Plan", "", "", "", "", "", ""], ["Month", "MPPSC Focus", "Core Topics", "Practice", "PD Focus", "Output", "Done"], ["1", "Foundation", "History, Geography, Polity, Economy basics, MP basics", "20–30 MCQs/day", "Communication foundation", "Complete basics + notes", "☐"], ["2", "Core GS", "History, Geography, Polity, Economy, Environment, MP Administration", "30–40 MCQs/day + PYQs", "Confidence + vocabulary", "Topic-wise practice", "☐"], ["3", "MP Special + Science", "MP History/Geography/Culture/Tribes/Parks/Schemes + Science", "50–100 MCQ Sunday test", "Body language + speaking", "MP strong notes", "☐"], ["4", "Prelims Intensive", "Full GS revision + Current Affairs + PYQs", "40–50 MCQs/day + weekly mock", "Public speaking + leadership", "Mock analysis system", "☐"], ["5", "Mains + Prelims", "GS + MP topics + answer writing + essay", "3–5 answers/week + essay", "Interview communication", "Mains writing habit", "☐"], ["6", "Final Revision", "Weak areas + short notes + Current Affairs + MP GK", "Full mocks + PYQs", "Interview + self-presentation", "3 revision cycles", "☐"]], "Weekly Planner": [["Weekly Planner", "", "", "", "", "", "", "", ""], ["Day", "Main Subject", "Night Practice", "MCQs", "Current Affairs", "PD Material", "Exercise", "Priority", "Done"], ["Mon", "History", "MCQ + Revision", "20–30", "20 min", "English speaking", "20 min", "New topic", "☐"], ["Tue", "Geography", "MCQ + Revision", "20–30", "20 min", "Vocabulary + sentences", "20 min", "New topic", "☐"], ["Wed", "Polity", "MCQ + Revision", "20–30", "20 min", "Communication", "20 min", "Concept clarity", "☐"], ["Thu", "Economy", "MCQ + Revision", "20–30", "20 min", "Body language", "20 min", "Practice", "☐"], ["Fri", "MP GK", "MCQ + Revision", "20–30", "20 min", "Confidence", "20 min", "Weekly syllabus", "☐"], ["Sat", "Science/Environment", "PYQ", "30–50", "30 min", "Leadership", "30 min", "Backlog", "☐"], ["Sun", "Full Revision", "Test + Analysis", "50–100", "Weekly review", "Speaking + reflection", "Walk", "Test day", "☐"]], "PD 30-Day Course": [["Personality Development | 30-Day Practical Course", "", "", "", "", ""], ["Day", "Topic", "Learn / Material", "Practice Task", "Duration", "Done"], ["1", "Self Introduction", "Structure: name, role, strengths, goals", "Record a 2-minute introduction", "30 min", "☐"], ["2", "English Sentences", "Learn 10 daily-use professional sentences", "Speak each sentence aloud 3 times", "30 min", "☐"], ["3", "Vocabulary", "10 useful words + meanings", "Use each in a sentence", "30 min", "☐"], ["4", "Active Listening", "Listen fully before responding", "Summarize a 2-minute conversation", "30 min", "☐"], ["5", "Clear Speech", "Short sentences; avoid fillers", "Record 3 minutes without 'umm/actually'", "30 min", "☐"], ["6", "Body Language", "Eye contact, posture, calm hands", "Practice in mirror", "30 min", "☐"], ["7", "Weekly Review", "Review Days 1–6", "Record improved introduction", "30 min", "☐"], ["8", "Confidence", "Speak slowly and clearly", "2-minute topic without notes", "30 min", "☐"], ["9", "Conversation", "Ask open questions", "Practice 5 questions", "30 min", "☐"], ["10", "Professional English", "Office phrases", "Use 10 phrases in speech", "30 min", "☐"], ["11", "Storytelling", "Beginning–middle–end", "Tell a 3-minute story", "30 min", "☐"], ["12", "Presentation", "Opening–3 points–close", "Give a 3-minute presentation", "30 min", "☐"], ["13", "Vocabulary", "10 workplace words", "Use in 5 sentences", "30 min", "☐"], ["14", "Review", "Assess fluency and confidence", "Record before/after comparison", "30 min", "☐"], ["15", "Leadership", "Ownership, delegation, accountability", "Describe one leadership situation", "30 min", "☐"], ["16", "Decision Making", "Problem → options → decision → result", "Solve one practical case", "30 min", "☐"], ["17", "Emotional Intelligence", "Pause, understand, respond", "Write 3 triggers + responses", "30 min", "☐"], ["18", "Difficult Conversation", "Facts + impact + solution", "Practice a respectful disagreement", "30 min", "☐"], ["19", "Negotiation", "Listen, clarify, propose", "Role-play a negotiation", "30 min", "☐"], ["20", "Public Speaking", "Hook + structure + conclusion", "Speak 5 minutes", "30 min", "☐"], ["21", "Weekly Review", "Review Days 15–20", "Give 5-minute talk", "30 min", "☐"], ["22", "MPPSC Interview", "Background + work + motivation", "Answer 5 interview questions", "30 min", "☐"], ["23", "Current Affairs Speaking", "Issue + facts + opinion + conclusion", "2-minute current issue summary", "30 min", "☐"], ["24", "Opinion Building", "Pros + cons + balanced conclusion", "Speak on a neutral topic", "30 min", "☐"], ["25", "Stress Control", "Breathing + pause + preparation", "2-minute calm speaking practice", "30 min", "☐"], ["26", "Professional Presence", "Dress, posture, greeting, etiquette", "Mirror practice", "30 min", "☐"], ["27", "Mock Interview", "Question → answer → example", "10-question mock interview", "30 min", "☐"], ["28", "Weak Area Fix", "Review recordings", "Repeat weakest exercise", "30 min", "☐"], ["29", "Final Presentation", "Structure a 5-minute talk", "Record and score yourself", "30 min", "☐"], ["30", "30-Day Assessment", "Compare Day 1 vs Day 30", "Set next 30-day goals", "30 min", "☐"]], "English Material": [["English Speaking | Ready-to-Use Material", "", "", ""], ["Category", "Material", "Practice", "Done"], ["Self Introduction", "My name is ___. I work as ___. My key responsibilities are ___. I am currently working on improving my knowledge and communication skills.", "Speak for 2 minutes", "☐"], ["Office", "I will check this and get back to you. / Let me clarify the point. / We need to prioritize this task. / I will share an update.", "Use 2 sentences daily", "☐"], ["Meetings", "I agree with the point. / May I add one point? / Could you please clarify? / Let us discuss the next steps.", "Practice aloud", "☐"], ["Polite disagreement", "I understand your point; however, I see it slightly differently because…", "Give one example", "☐"], ["Presentation", "Today I would like to discuss three points. First… Second… Finally… To conclude…", "3-minute talk", "☐"], ["Daily vocabulary", "priority, deadline, clarify, improve, implement, evaluate, efficient, consistent, opportunity, responsibility", "Make 10 sentences", "☐"]], "MPPSC Subject Tracker": [["MPPSC Subject & Revision Tracker", "", "", "", "", "", ""], ["Subject", "Topic/Chapter", "Study 1", "MCQ", "PYQ", "Revision", "Done"], ["Indian History", "", "☐", "☐", "☐", "☐", "☐"], ["Indian Geography", "", "☐", "☐", "☐", "☐", "☐"], ["Indian Polity", "", "☐", "☐", "☐", "☐", "☐"], ["Indian Economy", "", "☐", "☐", "☐", "☐", "☐"], ["MP History", "", "☐", "☐", "☐", "☐", "☐"], ["MP Geography", "", "☐", "☐", "☐", "☐", "☐"], ["MP Culture & Tribes", "", "☐", "☐", "☐", "☐", "☐"], ["MP Economy & Schemes", "", "☐", "☐", "☐", "☐", "☐"], ["Science", "", "☐", "☐", "☐", "☐", "☐"], ["Environment", "", "☐", "☐", "☐", "☐", "☐"], ["Current Affairs", "", "☐", "☐", "☐", "☐", "☐"], ["General Studies", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"], ["", "", "☐", "☐", "☐", "☐", "☐"]], "MCQ PYQ Tracker": [["MCQ / PYQ Performance Tracker", "", "", "", "", "", "", ""], ["Date", "Subject", "Attempted", "Correct", "Wrong", "Accuracy %", "Weak Topic", "Reviewed"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "", "☐"]], "Current Affairs": [["Current Affairs Tracker", "", "", "", "", "", ""], ["Date", "Category", "Topic", "Key Facts", "MP Angle", "Source/Note", "Revised"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"]], "Mains Answer Writing": [["Mains Answer-Writing Tracker", "", "", "", "", "", "", ""], ["Week", "Date", "Paper/GS", "Topic", "Question", "Word Target", "Self Score /10", "Done"], ["Week 1", "", "", "", "", "150", "", "☐"], ["Week 2", "", "", "", "", "150", "", "☐"], ["Week 3", "", "", "", "", "150", "", "☐"], ["Week 4", "", "", "", "", "150", "", "☐"], ["Week 5", "", "", "", "", "150", "", "☐"], ["Week 6", "", "", "", "", "150", "", "☐"], ["Week 7", "", "", "", "", "150", "", "☐"], ["Week 8", "", "", "", "", "150", "", "☐"], ["Week 9", "", "", "", "", "150", "", "☐"], ["Week 10", "", "", "", "", "150", "", "☐"], ["Week 11", "", "", "", "", "150", "", "☐"], ["Week 12", "", "", "", "", "150", "", "☐"], ["Week 13", "", "", "", "", "150", "", "☐"], ["Week 14", "", "", "", "", "150", "", "☐"], ["Week 15", "", "", "", "", "150", "", "☐"], ["Week 16", "", "", "", "", "150", "", "☐"], ["Week 17", "", "", "", "", "150", "", "☐"], ["Week 18", "", "", "", "", "150", "", "☐"], ["Week 19", "", "", "", "", "150", "", "☐"], ["Week 20", "", "", "", "", "150", "", "☐"], ["Week 21", "", "", "", "", "150", "", "☐"], ["Week 22", "", "", "", "", "150", "", "☐"], ["Week 23", "", "", "", "", "150", "", "☐"], ["Week 24", "", "", "", "", "150", "", "☐"], ["Week 25", "", "", "", "", "150", "", "☐"], ["Week 26", "", "", "", "", "150", "", "☐"], ["Week 27", "", "", "", "", "150", "", "☐"], ["Week 28", "", "", "", "", "150", "", "☐"], ["Week 29", "", "", "", "", "150", "", "☐"], ["Week 30", "", "", "", "", "150", "", "☐"], ["Week 31", "", "", "", "", "150", "", "☐"], ["Week 32", "", "", "", "", "150", "", "☐"], ["Week 33", "", "", "", "", "150", "", "☐"], ["Week 34", "", "", "", "", "150", "", "☐"], ["Week 35", "", "", "", "", "150", "", "☐"], ["Week 36", "", "", "", "", "150", "", "☐"], ["Week 37", "", "", "", "", "150", "", "☐"], ["Week 38", "", "", "", "", "150", "", "☐"], ["Week 39", "", "", "", "", "150", "", "☐"], ["Week 40", "", "", "", "", "150", "", "☐"], ["Week 41", "", "", "", "", "150", "", "☐"], ["Week 42", "", "", "", "", "150", "", "☐"], ["Week 43", "", "", "", "", "150", "", "☐"], ["Week 44", "", "", "", "", "150", "", "☐"], ["Week 45", "", "", "", "", "150", "", "☐"], ["Week 46", "", "", "", "", "150", "", "☐"], ["Week 47", "", "", "", "", "150", "", "☐"], ["Week 48", "", "", "", "", "150", "", "☐"], ["Week 49", "", "", "", "", "150", "", "☐"], ["Week 50", "", "", "", "", "150", "", "☐"], ["Week 51", "", "", "", "", "150", "", "☐"], ["Week 52", "", "", "", "", "150", "", "☐"]], "Mistake Book": [["Mistake Book | Learn From Errors", "", "", "", "", "", ""], ["Date", "Subject", "Question/Topic", "My Mistake", "Correct Concept", "Revision Date", "Resolved"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"], ["", "", "", "", "", "", "☐"]], "PD Habit Tracker": [["Personality Development Habit Tracker", "", "", "", "", "", "", "", ""], ["Week", "English", "Reading", "Speaking", "Vocabulary", "Body Language", "Meditation", "Exercise", "Review"], ["Week 1", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 2", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 3", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 4", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 5", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 6", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 7", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 8", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 9", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 10", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 11", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 12", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 13", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 14", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 15", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 16", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 17", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 18", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 19", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 20", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 21", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 22", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 23", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 24", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 25", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"], ["Week 26", "☐", "☐", "☐", "☐", "☐", "☐", "☐", "☐"]], "Weekly Review": [["Sunday Weekly Review", "", "", "", "", "", "", ""], ["Week", "Study Hours", "MCQs", "Test Score", "Strong Areas", "Weak Areas", "PD Progress", "Next Week Priority"], ["Week 1", "", "", "", "", "", "", ""], ["Week 2", "", "", "", "", "", "", ""], ["Week 3", "", "", "", "", "", "", ""], ["Week 4", "", "", "", "", "", "", ""], ["Week 5", "", "", "", "", "", "", ""], ["Week 6", "", "", "", "", "", "", ""], ["Week 7", "", "", "", "", "", "", ""], ["Week 8", "", "", "", "", "", "", ""], ["Week 9", "", "", "", "", "", "", ""], ["Week 10", "", "", "", "", "", "", ""], ["Week 11", "", "", "", "", "", "", ""], ["Week 12", "", "", "", "", "", "", ""], ["Week 13", "", "", "", "", "", "", ""], ["Week 14", "", "", "", "", "", "", ""], ["Week 15", "", "", "", "", "", "", ""], ["Week 16", "", "", "", "", "", "", ""], ["Week 17", "", "", "", "", "", "", ""], ["Week 18", "", "", "", "", "", "", ""], ["Week 19", "", "", "", "", "", "", ""], ["Week 20", "", "", "", "", "", "", ""], ["Week 21", "", "", "", "", "", "", ""], ["Week 22", "", "", "", "", "", "", ""], ["Week 23", "", "", "", "", "", "", ""], ["Week 24", "", "", "", "", "", "", ""], ["Week 25", "", "", "", "", "", "", ""], ["Week 26", "", "", "", "", "", "", ""]], "Free App Plan": [["Free / Freemium Practice Plan", "", "", "", ""], ["Tool", "Use For", "Daily Use", "Weekly Use", "How to Use"], ["Duolingo", "English habit, vocabulary", "10–15 min", "5–6 days", "Complete a short lesson; repeat difficult words aloud"], ["HelloTalk", "Real conversation practice", "10–15 min", "2–3 conversations", "Send voice messages and request corrections"], ["CoCap", "AI speaking practice", "10–15 min", "3–5 sessions", "Use English/Hindi/Hinglish speaking challenges"], ["ChatGPT Voice", "Speaking partner + mock interview", "10–15 min", "1 mock interview", "Practice MPPSC interview and get corrections"]], "MPPSC Interview Practice": [["MPPSC Interview Practice", "", "", "", ""], ["No.", "Question", "Preparation Points", "Practice Date", "Done"], ["1", "Tell us about yourself.", "Answer in 60–90 seconds; use a real example", "", "☐"], ["2", "Why do you want to join the civil services?", "Answer in 60–90 seconds; use a real example", "", "☐"], ["3", "Tell us about your current work and responsibilities.", "Answer in 60–90 seconds; use a real example", "", "☐"], ["4", "What are your strengths and one area you are improving?", "Answer in 60–90 seconds; use a real example", "", "☐"], ["5", "How do you handle pressure and deadlines?", "Answer in 60–90 seconds; use a real example", "", "☐"], ["6", "Describe a difficult decision you made.", "Answer in 60–90 seconds; use a real example", "", "☐"], ["7", "How would you handle disagreement in a team?", "Answer in 60–90 seconds; use a real example", "", "☐"], ["8", "Discuss one important current issue objectively.", "Answer in 60–90 seconds; use a real example", "", "☐"], ["9", "What do you know about Madhya Pradesh?", "Answer in 60–90 seconds; use a real example", "", "☐"], ["10", "What would you do if you made a mistake in an important decision?", "Answer in 60–90 seconds; use a real example", "", "☐"], ["11", "How do you prioritize work?", "Answer in 60–90 seconds; use a real example", "", "☐"], ["12", "What does good leadership mean to you?", "Answer in 60–90 seconds; use a real example", "", "☐"], ["13", "How do you respond to criticism?", "Answer in 60–90 seconds; use a real example", "", "☐"], ["14", "Why should we select you?", "Answer in 60–90 seconds; use a real example", "", "☐"], ["15", "What is your five-year professional goal?", "Answer in 60–90 seconds; use a real example", "", "☐"]]};
+const order = ["START HERE","Daily Planner","6-Month Master","Weekly Planner","PD 30-Day Course","English Material","MPPSC Subject Tracker","MCQ PYQ Tracker","Current Affairs","Mains Answer Writing","Mistake Book","PD Habit Tracker","Weekly Review","Free App Plan","MPPSC Interview Practice"];
+const titles = {"START HERE":"Start Here","Daily Planner":"Daily Planner","6-Month Master":"6-Month Master Plan","Weekly Planner":"Weekly Planner","PD 30-Day Course":"PD 30-Day Course","English Material":"English Material","MPPSC Subject Tracker":"MPPSC Subject Tracker","MCQ PYQ Tracker":"MCQ / PYQ Tracker","Current Affairs":"Current Affairs","Mains Answer Writing":"Mains Answer Writing","Mistake Book":"Mistake Book","PD Habit Tracker":"PD Habit Tracker","Weekly Review":"Weekly Review","Free App Plan":"Free / Freemium Practice","MPPSC Interview Practice":"Interview Practice"};
+let progress = JSON.parse(localStorage.getItem("mppscPlannerProgress") || "{}");
+
+function esc(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));}
+function buildNav(){
+  document.getElementById("nav").innerHTML = order.map((s,i)=>`<button class="${i===0?'active':''}" onclick="openSheet('${esc(s).replace(/'/g,"\\'")}')">${esc(titles[s])}</button>`).join("");
+  document.getElementById("nav").innerHTML += `<button onclick="openDashboard()">📊 Dashboard</button>`;
+}
+function openDashboard(){
+  document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+  document.getElementById("dashboard").classList.add("active");
+  document.getElementById("pageTitle").textContent="Dashboard";
+  document.getElementById("subtitle").textContent="Your complete MPPSC study planner • "+new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+  document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));
+  renderDashboard();
+}
+function openSheet(sheet){
+  document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
+  document.getElementById("sheetPage").classList.add("active");
+  document.getElementById("pageTitle").textContent=titles[sheet]||sheet;
+  document.getElementById("subtitle").textContent=`${DATA[sheet].length-1} rows from your Excel planner`;
+  document.getElementById("sheetSearch").value="";
+  document.querySelectorAll(".nav button").forEach(x=>x.classList.remove("active"));
+  [...document.querySelectorAll(".nav button")].find(x=>x.textContent===titles[sheet])?.classList.add("active");
+  document.getElementById("sheetPage").dataset.sheet=sheet;
+  renderSheet();
+}
+function rowKey(sheet,rowIndex,colIndex){return sheet+"|"+rowIndex+"|"+colIndex;}
+function isCheck(v){return ["☐","☑","✓","✔","true","True"].includes(String(v).trim());}
+function renderSheet(){
+  const sheet=document.getElementById("sheetPage").dataset.sheet;
+  if(!sheet)return;
+  const rows=DATA[sheet]||[], q=document.getElementById("sheetSearch").value.toLowerCase();
+  if(!rows.length){document.getElementById("tableWrap").innerHTML='<div class="empty">No data.</div>';return;}
+  const head=rows[1]||rows[0], body=rows.slice(rows[0]===head?1:1).filter(r=>r.some(c=>String(c).trim()) && (!q || r.join(" ").toLowerCase().includes(q)));
+  let out="<table><thead><tr>"+head.map(h=>`<th>${esc(h)}</th>`).join("")+"</tr></thead><tbody>";
+  body.forEach((r,ri)=>{
+    const originalIndex=rows.indexOf(r);
+    out+="<tr>";
+    r.forEach((v,ci)=>{
+      const key=rowKey(sheet,originalIndex,ci), checked=progress[key]===true;
+      if(isCheck(v)){
+        out+=`<td><input type="checkbox" ${checked?"checked":""} onchange="toggle('${key.replace(/'/g,"\\'")}',this.checked)"></td>`;
+      } else out+=`<td>${esc(v)}</td>`;
+    });
+    out+="</tr>";
+  });
+  out+="</tbody></table>";
+  document.getElementById("tableWrap").innerHTML=out;
+}
+function toggle(key,val){progress[key]=val;localStorage.setItem("mppscPlannerProgress",JSON.stringify(progress));renderDashboard();}
+function renderDashboard(){
+  let tasks=0,done=0;
+  for(const s of order){
+    const rows=DATA[s]||[];
+    rows.forEach((r,ri)=>r.forEach((v,ci)=>{if(isCheck(v)){tasks++; if(progress[rowKey(s,ri,ci)])done++;}}));
+  }
+  const pct=tasks?Math.round(done/tasks*100):0;
+  document.getElementById("sectionCount").textContent=order.length;
+  document.getElementById("taskCount").textContent=tasks;
+  document.getElementById("doneCount").textContent=done;
+  document.getElementById("pct").textContent=pct+"%";
+  document.getElementById("overallBar").style.width=pct+"%";
+
+  const daily=DATA["Daily Planner"]||[];
+  const drows=daily.slice(2).filter(r=>r.some(x=>String(x).trim()));
+  document.getElementById("todayTasks").innerHTML=drows.slice(0,8).map((r,i)=>{
+    const text=[r[0],r[1],r[2],r[3]].filter(Boolean).join(" — ");
+    const ci=5,key=rowKey("Daily Planner",daily.indexOf(r),ci), checked=progress[key]===true;
+    return `<label class="task ${checked?"done":""}"><input type="checkbox" ${checked?"checked":""} onchange="toggle('${key}',this.checked)"><span>${esc(text||"Daily task")}</span></label>`;
+  }).join("") || '<div class="empty">Add your daily tasks in the Excel planner.</div>';
+
+  const master=DATA["6-Month Master"]||[];
+  document.getElementById("roadmap").innerHTML=master.slice(2,8).map(r=>`<div class="roadmap-item"><div style="display:flex;justify-content:space-between"><b>Month ${esc(r[0])}</b><span class="pill">${esc(r[1])}</span></div><div class="note">${esc(r[2]||"")}</div></div>`).join("");
+}
+function resetProgress(){if(confirm("Reset all checkbox progress on this device?")){progress={};localStorage.removeItem("mppscPlannerProgress");renderDashboard();}}
+function exportProgress(){
+  const blob=new Blob([JSON.stringify(progress,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="mppsc-planner-progress.json";a.click();URL.revokeObjectURL(a.href);
+}
+buildNav(); renderDashboard();
+
+/* === Extra productivity features === */
+let timerSeconds=25*60, timerHandle=null;
+const quotes=[
+  "Consistency beats intensity. Win today with one focused session.",
+  "Small daily progress becomes a big MPPSC advantage.",
+  "Don't wait for motivation—start with 10 focused minutes.",
+  "Revise, practice, analyze, repeat. That is the system.",
+  "Your future result is built from today's ordinary habits."
+];
+
+function toast(msg){
+  const el=document.getElementById("toast"); if(!el)return;
+  el.textContent=msg; el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"),2200);
+}
+function todayKey(){
+  const d=new Date(); return d.toISOString().slice(0,10);
+}
+function updateStreak(){
+  const completedToday = Object.keys(progress).some(k=>progress[k]===true);
+  const hist=JSON.parse(localStorage.getItem("mppscStudyDays")||"{}");
+  if(completedToday) hist[todayKey()]=true;
+  localStorage.setItem("mppscStudyDays",JSON.stringify(hist));
+  let streak=0, d=new Date();
+  while(true){
+    const k=d.toISOString().slice(0,10);
+    if(!hist[k]) break;
+    streak++;
+    d.setDate(d.getDate()-1);
+  }
+  const el=document.getElementById("streakValue"); if(el) el.textContent=streak;
+}
+function addGoal(){
+  const input=document.getElementById("goalInput"), text=input.value.trim();
+  if(!text)return;
+  const goals=JSON.parse(localStorage.getItem("mppscGoals")||"[]");
+  goals.push({text,done:false});
+  localStorage.setItem("mppscGoals",JSON.stringify(goals));
+  input.value=""; renderGoals(); toast("Goal added");
+}
+function renderGoals(){
+  const el=document.getElementById("goalList"); if(!el)return;
+  const goals=JSON.parse(localStorage.getItem("mppscGoals")||"[]");
+  el.innerHTML=goals.length?goals.map((g,i)=>`
+    <label class="goal"><input type="checkbox" ${g.done?"checked":""} onchange="toggleGoal(${i},this.checked)">
+    <span style="${g.done?'text-decoration:line-through;color:var(--muted)':''}">${esc(g.text)}</span>
+    <button class="mini-btn" style="margin-left:auto;padding:4px 7px" onclick="deleteGoal(${i})">×</button></label>`).join(""):'<div class="note">No goals yet.</div>';
+}
+function toggleGoal(i,val){
+  const goals=JSON.parse(localStorage.getItem("mppscGoals")||"[]"); goals[i].done=val;
+  localStorage.setItem("mppscGoals",JSON.stringify(goals)); renderGoals();
+}
+function deleteGoal(i){
+  const goals=JSON.parse(localStorage.getItem("mppscGoals")||"[]"); goals.splice(i,1);
+  localStorage.setItem("mppscGoals",JSON.stringify(goals)); renderGoals();
+}
+function newQuote(){
+  const q=quotes[Math.floor(Math.random()*quotes.length)];
+  localStorage.setItem("mppscQuote",q);
+  document.getElementById("dailyQuote").textContent=q;
+}
+function renderQuote(){
+  const saved=localStorage.getItem("mppscQuote");
+  document.getElementById("dailyQuote").textContent=saved||quotes[new Date().getDate()%quotes.length];
+}
+function updateTimer(){
+  const m=String(Math.floor(timerSeconds/60)).padStart(2,"0"), s=String(timerSeconds%60).padStart(2,"0");
+  document.getElementById("timerDisplay").textContent=`${m}:${s}`;
+}
+function startTimer(){
+  if(timerHandle)return;
+  timerHandle=setInterval(()=>{
+    if(timerSeconds<=0){clearInterval(timerHandle);timerHandle=null;toast("🎉 Focus session complete!");return;}
+    timerSeconds--; updateTimer();
+  },1000);
+}
+function pauseTimer(){if(timerHandle){clearInterval(timerHandle);timerHandle=null;}}
+function resetTimer(){
+  pauseTimer();
+  let n=parseInt(document.getElementById("timerMinutes").value)||25;
+  timerSeconds=Math.max(1,Math.min(180,n))*60; updateTimer();
+}
+function toggleTheme(){
+  document.body.classList.toggle("dark");
+  const dark=document.body.classList.contains("dark");
+  localStorage.setItem("mppscDark",dark?"1":"0");
+  document.getElementById("themeText").textContent=dark?"Dark Mode":"Light Mode";
+}
+function loadTheme(){
+  const dark=localStorage.getItem("mppscDark")==="1";
+  if(dark)document.body.classList.add("dark");
+  const el=document.getElementById("themeText"); if(el)el.textContent=dark?"Dark Mode":"Light Mode";
+}
+function exportFullData(){
+  const payload={
+    progress,
+    goals:JSON.parse(localStorage.getItem("mppscGoals")||"[]"),
+    studyDays:JSON.parse(localStorage.getItem("mppscStudyDays")||"{}"),
+    targets:JSON.parse(localStorage.getItem("mppscTargets")||"{}"),
+    mocks:JSON.parse(localStorage.getItem("mppscMocks")||"[]"),
+    alarm:JSON.parse(localStorage.getItem("mppscAlarm")||"null"),
+    examProfile:JSON.parse(localStorage.getItem("mppscExamProfile")||"{}"),
+    syllabus:JSON.parse(localStorage.getItem("mppscSyllabus")||"[]"),
+    dark:localStorage.getItem("mppscDark")==="1"
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="mppsc-planner-backup.json";a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),500); toast("Backup downloaded");
+}
+function importData(){
+  const input=document.createElement("input"); input.type="file"; input.accept=".json,application/json";
+  input.onchange=()=>{const f=input.files[0];if(!f)return;
+    const r=new FileReader();r.onload=()=>{
+      try{
+        const p=JSON.parse(r.result);
+        if(p.progress)progress=p.progress;
+        if(p.goals)localStorage.setItem("mppscGoals",JSON.stringify(p.goals));
+        if(p.studyDays)localStorage.setItem("mppscStudyDays",JSON.stringify(p.studyDays));
+        if(p.targets)localStorage.setItem("mppscTargets",JSON.stringify(p.targets));
+        if(p.mocks)localStorage.setItem("mppscMocks",JSON.stringify(p.mocks));
+        if(p.alarm)localStorage.setItem("mppscAlarm",JSON.stringify(p.alarm));
+        if(p.examProfile)localStorage.setItem("mppscExamProfile",JSON.stringify(p.examProfile));
+        if(p.syllabus)localStorage.setItem("mppscSyllabus",JSON.stringify(p.syllabus));
+        localStorage.setItem("mppscDark",p.dark?"1":"0");
+        loadTheme();renderGoals();updateStreak();renderDashboard();toast("Progress restored");
+      }catch(e){toast("Invalid backup file");}
+    };r.readAsText(f);
+  };input.click();
+}
+
+/* Wrap existing toggle so streak updates automatically. */
+const _oldToggle=toggle;
+toggle=function(key,val){_oldToggle(key,val);updateStreak();};
+
+/* Initialize new features after existing app initialization. */
+setTimeout(()=>{loadTheme();renderGoals();renderQuote();updateTimer();updateStreak();},0);
+
+/* === Study Alarm === */
+let alarmTimer=null;
+let alarmAudio=null;
+
+function setAlarm(){
+  const time=document.getElementById("alarmTime").value;
+  const type=document.getElementById("alarmType").value;
+  if(!time){toast("Please select an alarm time");return;}
+  localStorage.setItem("mppscAlarm",JSON.stringify({time,type}));
+  scheduleAlarm();
+  renderAlarm();
+  toast("⏰ Alarm set for "+time);
+}
+function clearAlarm(){
+  if(alarmTimer)clearInterval(alarmTimer);
+  alarmTimer=null;
+  localStorage.removeItem("mppscAlarm");
+  renderAlarm();
+  toast("Alarm cleared");
+}
+function scheduleAlarm(){
+  if(alarmTimer)clearInterval(alarmTimer);
+  const saved=JSON.parse(localStorage.getItem("mppscAlarm")||"null");
+  if(!saved)return;
+  alarmTimer=setInterval(()=>{
+    const now=new Date();
+    const current=String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
+    const second=now.getSeconds();
+    if(current===saved.time && second<2){
+      triggerAlarm(saved.type);
+    }
+  },1000);
+}
+function triggerAlarm(type){
+  // Browser audio alarm using Web Audio; may require one prior user interaction.
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(AC){
+      const ctx=new AC();
+      let count=0;
+      const beep=()=>{
+        const osc=ctx.createOscillator(), gain=ctx.createGain();
+        osc.frequency.value=count%2?880:660; osc.type="sine";
+        gain.gain.setValueAtTime(.0001,ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(.22,ctx.currentTime+.02);
+        gain.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+.35);
+        osc.connect(gain);gain.connect(ctx.destination);osc.start();osc.stop(ctx.currentTime+.36);
+        count++; if(count<8)setTimeout(beep,450); else setTimeout(()=>ctx.close(),500);
+      };
+      beep();
+    }
+  }catch(e){}
+  if("Notification" in window && Notification.permission==="granted"){
+    new Notification("⏰ MPPSC Planner Alarm",{body:"Time for your "+type+" session!"});
+  }
+  toast("⏰ "+type+" time! Start your session.");
+  const cards=document.querySelectorAll(".feature-card");
+  cards.forEach(c=>{if(c.textContent.includes("Study Alarm")){c.classList.add("alarm-active");setTimeout(()=>c.classList.remove("alarm-active"),5000)}});
+}
+function renderAlarm(){
+  const el=document.getElementById("alarmStatus"); if(!el)return;
+  const saved=JSON.parse(localStorage.getItem("mppscAlarm")||"null");
+  if(saved){
+    el.textContent="⏰ "+saved.time+" • "+saved.type+" alarm is active.";
+    document.getElementById("alarmTime").value=saved.time;
+    document.getElementById("alarmType").value=saved.type;
+  }else el.textContent="No alarm set.";
+}
+function requestAlarmPermission(){
+  if("Notification" in window && Notification.permission==="default"){
+    Notification.requestPermission().then(()=>toast("Notification permission updated"));
+  }
+}
+
+/* Start/recover alarm on app load. */
+setTimeout(()=>{
+  renderAlarm();
+  scheduleAlarm();
+  // Request permission only after the user has opened the app; browser may still block it.
+  document.getElementById("alarmTime")?.addEventListener("focus",requestAlarmPermission,{once:true});
+},50);
+
+/* === Calendar & Daily Targets === */
+let calendarDate=new Date(), selectedDate=new Date();
+function dateKey(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function changeMonth(delta){calendarDate.setMonth(calendarDate.getMonth()+delta);renderCalendar()}
+function renderCalendar(){
+  const y=calendarDate.getFullYear(),m=calendarDate.getMonth();
+  const title=document.getElementById("calendarTitle");
+  if(title)title.textContent=calendarDate.toLocaleDateString("en-IN",{month:"long",year:"numeric"});
+  const el=document.getElementById("calendar"); if(!el)return;
+  const names=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  let out=names.map(x=>`<div class="cal-week">${x}</div>`).join("");
+  const first=new Date(y,m,1).getDay(), days=new Date(y,m+1,0).getDate();
+  for(let i=0;i<first;i++)out+='<div></div>';
+  const targets=JSON.parse(localStorage.getItem("mppscTargets")||"{}"), today=dateKey(new Date());
+  for(let d=1;d<=days;d++){
+    const key=dateKey(new Date(y,m,d)), cls=[key===today?"today":"",key===dateKey(selectedDate)?"selected":"",targets[key]?"has-target":""].filter(Boolean).join(" ");
+    out+=`<div class="cal-day ${cls}" onclick="selectCalendarDate(${y},${m},${d})">${d}</div>`;
+  }
+  el.innerHTML=out; renderTarget();
+}
+function selectCalendarDate(y,m,d){selectedDate=new Date(y,m,d);renderCalendar()}
+function renderTarget(){
+  const key=dateKey(selectedDate), all=JSON.parse(localStorage.getItem("mppscTargets")||"{}"), t=all[key]||{hours:0,mcq:0,tasks:0};
+  document.getElementById("targetHours").textContent=t.hours||0;
+  document.getElementById("targetMcq").textContent=t.mcq||0;
+  document.getElementById("targetTasks").textContent=t.tasks||0;
+  document.getElementById("goalHours").value=t.hours||"";
+  document.getElementById("goalMcq").value=t.mcq||"";
+  document.getElementById("goalTasks").value=t.tasks||"";
+  document.getElementById("targetDateLabel").textContent="Target date: "+selectedDate.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+}
+function saveDailyTarget(){
+  const all=JSON.parse(localStorage.getItem("mppscTargets")||"{}"),key=dateKey(selectedDate);
+  all[key]={hours:Number(document.getElementById("goalHours").value)||0,mcq:Number(document.getElementById("goalMcq").value)||0,tasks:Number(document.getElementById("goalTasks").value)||0};
+  localStorage.setItem("mppscTargets",JSON.stringify(all));renderCalendar();toast("🎯 Daily target saved");
+}
+
+/* === Subject progress chart === */
+function renderSubjectChart(){
+  const el=document.getElementById("subjectChart");if(!el)return;
+  const rows=DATA["MPPSC Subject Tracker"]||[], names=[], vals=[];
+  rows.slice(2).forEach(r=>{
+    if(!String(r[0]||"").trim())return;
+    let total=0,done=0;
+    for(let c=2;c<r.length;c++){if(isCheck(r[c])){total++;if(progress[rowKey("MPPSC Subject Tracker",rows.indexOf(r),c)])done++;}}
+    names.push(r[0]); vals.push(total?Math.round(done/total*100):0);
+  });
+  el.innerHTML=names.map((n,i)=>`<div class="chart-col"><div class="chart-val">${vals[i]}%</div><div class="chart-bar" style="height:${Math.max(3,vals[i]*1.7)}px" title="${esc(n)}: ${vals[i]}%"></div><div class="chart-label">${esc(n.replace("Indian ","").replace("MP ","MP "))}</div></div>`).join("");
+}
+
+/* === Mock test scoreboard === */
+function addMock(){
+  const name=document.getElementById("mockName").value.trim(); if(!name){toast("Enter test name");return;}
+  const total=Math.max(1,Number(document.getElementById("mockTotal").value)||0),correct=Math.min(total,Math.max(0,Number(document.getElementById("mockCorrect").value)||0));
+  const list=JSON.parse(localStorage.getItem("mppscMocks")||"[]");
+  list.unshift({name,total,correct,date:new Date().toLocaleDateString("en-IN")});
+  localStorage.setItem("mppscMocks",JSON.stringify(list));document.getElementById("mockName").value="";document.getElementById("mockTotal").value="";document.getElementById("mockCorrect").value="";
+  renderMocks();toast("🧪 Mock test added");
+}
+function deleteMock(i){const l=JSON.parse(localStorage.getItem("mppscMocks")||"[]");l.splice(i,1);localStorage.setItem("mppscMocks",JSON.stringify(l));renderMocks()}
+function renderMocks(){
+  const el=document.getElementById("mockList");if(!el)return;
+  const l=JSON.parse(localStorage.getItem("mppscMocks")||"[]");
+  el.innerHTML=l.length?l.map((x,i)=>`<div class="mock-row"><b>${esc(x.name)}</b><span>${x.correct}/${x.total}</span><span>${Math.round(x.correct/x.total*100)}%</span><span>${esc(x.date)}</span><button class="mini-btn" onclick="deleteMock(${i})">×</button></div>`).join(""):'<div class="empty">No mock tests recorded.</div>';
+}
+
+/* Extend existing dashboard rendering. */
+const _oldRenderDashboard=renderDashboard;
+renderDashboard=function(){
+  _oldRenderDashboard();
+  renderCalendar();renderSubjectChart();renderMocks();updateStreak();
+};
+setTimeout(()=>{renderCalendar();renderSubjectChart();renderMocks()},150);
+
+/* === Exam Profile & Syllabus === */
+let examCountdownTimer=null;
+const defaultSyllabus=[
+  "General Studies – History",
+  "General Studies – Geography",
+  "General Studies – Indian Polity",
+  "General Studies – Economy",
+  "General Studies – Science & Technology",
+  "General Studies – Environment",
+  "General Studies – Current Affairs",
+  "Madhya Pradesh GK",
+  "General Hindi",
+  "General English",
+  "CSAT / Aptitude",
+  "Mains – Essay & Answer Writing"
+];
+
+function getExamProfile(){return JSON.parse(localStorage.getItem("mppscExamProfile")||"{}")}
+function saveExamProfile(){
+  const p={
+    applicationNo:document.getElementById("applicationNo").value.trim(),
+    rollNo:document.getElementById("rollNo").value.trim(),
+    examName:document.getElementById("examName").value.trim(),
+    examDate:document.getElementById("examDate").value,
+    admitDate:document.getElementById("admitDate").value,
+    resultDate:document.getElementById("resultDate").value,
+    formLink:document.getElementById("examFormLink").value.trim(),
+    admitLink:document.getElementById("admitLink").value.trim(),
+    notes:document.getElementById("examNotes").value.trim()
+  };
+  localStorage.setItem("mppscExamProfile",JSON.stringify(p));renderExamProfile();toast("🎓 Exam details saved");
+}
+function clearExamProfile(){
+  if(!confirm("Clear saved exam details?"))return;
+  localStorage.removeItem("mppscExamProfile");renderExamProfile();toast("Exam details cleared");
+}
+function fmtDate(v){
+  if(!v)return "";
+  return new Date(v+"T00:00:00").toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+}
+function renderExamProfile(){
+  const p=getExamProfile();
+  const map={applicationNo:"applicationNo",rollNo:"rollNo",examName:"examName",examDate:"examDate",admitDate:"admitDate",resultDate:"resultDate",formLink:"examFormLink",admitLink:"admitLink",notes:"examNotes"};
+  Object.entries(map).forEach(([k,id])=>{const e=document.getElementById(id);if(e)e.value=p[k]||""});
+  const status=document.getElementById("examStatus");
+  if(status)status.textContent=p.examDate?`${p.examName||"MPPSC Exam"} • ${fmtDate(p.examDate)}`:"Exam details not set";
+  const chips=[];
+  if(p.applicationNo)chips.push("Application: "+p.applicationNo);
+  if(p.admitDate)chips.push("Admit Card: "+fmtDate(p.admitDate));
+  if(p.resultDate)chips.push("Result: "+fmtDate(p.resultDate));
+  if(p.formLink)chips.push("🔗 Notification/Form");
+  if(p.admitLink)chips.push("🔗 Admit Card");
+  document.getElementById("examInfoChips").innerHTML=chips.map(x=>`<span class="info-chip">${esc(x)}</span>`).join("");
+  updateCountdown();
+}
+function updateCountdown(){
+  const p=getExamProfile(), empty=document.getElementById("examCountdownEmpty"), box=document.getElementById("examCountdown");
+  if(!p.examDate){empty.style.display="block";box.style.display="none";return}
+  const target=new Date(p.examDate+"T00:00:00").getTime(), diff=target-Date.now();
+  empty.style.display="none";box.style.display="grid";
+  const d=Math.max(0,diff), days=Math.floor(d/86400000),hours=Math.floor(d%86400000/3600000),mins=Math.floor(d%3600000/60000),secs=Math.floor(d%60000/1000);
+  document.getElementById("cdDays").textContent=days;document.getElementById("cdHours").textContent=hours;
+  document.getElementById("cdMinutes").textContent=mins;document.getElementById("cdSeconds").textContent=secs;
+  if(diff<=0)document.getElementById("examStatus").textContent=(p.examName||"MPPSC Exam")+" • Exam day/Date passed";
+}
+function syllabusData(){
+  let x=JSON.parse(localStorage.getItem("mppscSyllabus")||"null");
+  if(!x){x=defaultSyllabus.map((name,i)=>({name,done:false}));localStorage.setItem("mppscSyllabus",JSON.stringify(x))}
+  return x;
+}
+function renderSyllabus(){
+  const el=document.getElementById("syllabusList");if(!el)return;
+  const list=syllabusData();
+  const done=list.filter(x=>x.done).length;
+  el.innerHTML=(list.length?list.map((x,i)=>`<label class="syllabus-item ${x.done?"done":""}">
+    <input type="checkbox" ${x.done?"checked":""} onchange="toggleSyllabus(${i},this.checked)">
+    <span style="flex:1;${x.done?"text-decoration:line-through;color:var(--muted)":""}">${esc(x.name)}</span>
+    <button class="mini-btn" onclick="deleteSyllabus(${i})">×</button></label>`).join(""):'<div class="empty">No syllabus topics added.</div>')
+    +`<div class="note">Completed: <b>${done}/${list.length}</b> (${list.length?Math.round(done/list.length*100):0}%)</div>`;
+}
+function addSyllabus(){
+  const e=document.getElementById("syllabusInput"),name=e.value.trim();if(!name)return;
+  const list=syllabusData();list.push({name,done:false});localStorage.setItem("mppscSyllabus",JSON.stringify(list));e.value="";renderSyllabus();toast("📚 Syllabus topic added");
+}
+function toggleSyllabus(i,v){const l=syllabusData();l[i].done=v;localStorage.setItem("mppscSyllabus",JSON.stringify(l));renderSyllabus()}
+function deleteSyllabus(i){const l=syllabusData();l.splice(i,1);localStorage.setItem("mppscSyllabus",JSON.stringify(l));renderSyllabus()}
+
+setInterval(updateCountdown,1000);
+setTimeout(()=>{renderExamProfile();renderSyllabus()},200);
+</script>
+<div class="toast" id="toast"></div>
+</body>
+</html>
